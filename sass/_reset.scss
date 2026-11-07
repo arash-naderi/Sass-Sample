@@ -1,0 +1,39 @@
+/*══════════════════════════════════════════════════════════════════
+   Partial file
+  ══════════════════════════════════════════════════════════════════
+   Files whose name starts with _ are called Partials; they are never
+   compiled to CSS on their own — they exist only to be @used by other
+   files.
+  ══════════════════════════════════════════════════════════════════*/
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html,
+body,
+h1, h2, h3,
+p,
+ul, ol {
+    margin: 0;
+    padding: 0;
+}
+
+ul, ol {
+    list-style: none;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+button {
+    font-family: inherit;
+}
+
+img {
+    max-width: 100%;
+}

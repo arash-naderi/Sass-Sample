@@ -1,0 +1,42 @@
+@use "sass:math";
+@use "sass:map";
+/*`as v` shortens the namespace — members are then accessed as v.$theme.
+  (This namespaced access is the standard alternative to `as *`.) */
+@use "variables" as v;
+
+/*══════════════════════════════════════════════════════════════════
+   Custom Functions — @function and @return
+  ══════════════════════════════════════════════════════════════════
+   Unlike a mixin (which generates CSS), a function "returns a value"
+   (with @return) that can be used in calculations and properties.
+  ══════════════════════════════════════════════════════════════════*/
+
+/*─── Convert pixels to rem ───
+  Important: the division operator (/) is deprecated in modern Sass;
+  division must be done with math.div */
+@function px-to-rem($px, $base: 16px) {
+    @return math.div($px, $base) * 1rem;
+}
+
+// ─── Percentage calculation ───
+@function percent($part, $total) {
+    @return math.percentage(math.div($part, $total));
+}
+
+// ─── Double a number ───
+@function double($n) {
+    @return $n * 2;
+}
+
+/*─── Read a color from the $theme map ───
+  If the key does not exist, it emits a @warn (compilation continues)
+  and returns a fallback value. Functions can contain @if. */
+@function theme-color($name) {
+    @if map.has-key(v.$theme, $name) {
+        @return map.get(v.$theme, $name);
+    }
+    @else {
+        @warn "Color '#{$name}' is not defined in the $theme map; falling back to gray.";
+        @return #999999;
+    }
+}

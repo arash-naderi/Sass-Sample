@@ -1,0 +1,736 @@
+@charset "UTF-8";
+/*╔══════════════════════════════════════════════════════════════════╗
+  ║          The Complete Sass Guide — Every Rule Explained          ║
+  ╚══════════════════════════════════════════════════════════════════╝
+   Auto-recompile on save:          npm run sass:watch
+   The .scss syntax is standard; the old .sass syntax (no braces/semicolons) is deprecated.
+
+   Table of contents:
+    1) Comments                     2) @use + module config with with    3) Debugging @debug/@warn/@error
+    4) Variables, scope & !global   5) Nesting & the & selector          6) Interpolation #{}
+    7) Operators                    8) Conditions @if / @else + if()     9) The @for loop
+   10) The @each loop              11) The @while loop                  12) Calling mixins
+   13) @extend & placeholders      14) Built-in Sass functions          15) Custom functions
+   16) @at-root                    17) Demo page layout */
+/*══════════════════════════════════════════════════════════════════
+  1) Comments
+  ══════════════════════════════════════════════════════════════════
+  Double-slash comments are visible "only in the Sass file" and are removed from the CSS output. */
+/* Regular CSS comments stay in the output too (good for licenses / important notes). */
+/*══════════════════════════════════════════════════════════════════
+  2) @use — loading modules (the modern replacement for @import)
+  ══════════════════════════════════════════════════════════════════
+   • The old @import is deprecated in modern Sass; @use replaces it.
+   • @use turns a file into a "module": each file is loaded only once, and its
+     variables/mixins/functions are available under the file-name prefix (namespace).
+   • `as` gives the module a shorter name; `as *` means use its members "without a prefix".
+   • `with` lets you set the module's !default variables at load time
+     (this is called "configuring a module"). Here $container-width changes from 960px to 720px: */
+/*══════════════════════════════════════════════════════════════════
+   @forward — re-exporting modules
+  ══════════════════════════════════════════════════════════════════
+   @forward makes another module's members available "through this
+   file" without using them itself. This way the main file writes a
+   single @use instead of several — a common pattern in real projects.
+   Note: !default variables can also be configured through this path
+   with `with`. @forward additionally supports `as prefix-*`, `show`
+   and `hide` to control exactly which members are re-exported.
+  ══════════════════════════════════════════════════════════════════*/
+/*══════════════════════════════════════════════════════════════════
+   Variables and Data Types
+  ══════════════════════════════════════════════════════════════════
+   Variables start with a dollar sign ($) and take their value after
+   a colon (:). They can hold seven data types:
+     1) Number  → 16px or 1.5 (numbers can carry units)
+     2) String  → "Vazirmatn" or sans-serif (quoted or unquoted)
+     3) Color   → red, #3498db or rgb(52, 152, 219)
+     4) Boolean → only true or false
+     5) Null    → nothing; a property set to null is omitted from the CSS output
+     6) List    → 1px 2px 3px (separated by spaces or commas)
+     7) Map     → ("key": value, ...) similar to a JavaScript object
+  ══════════════════════════════════════════════════════════════════*/
+/*─── The !default flag ───
+  Assigns this value only if the variable is not already defined
+  or its current value is null; otherwise, keeps the existing value.
+  This allows the variable to be overridden using `@use ... with`
+  (e.g. style.scss overrides $container-width to 720px). */
+/*══════════════════════════════════════════════════════════════════
+   Mixins — @mixin and @include
+  ══════════════════════════════════════════════════════════════════
+   Mixins are reusable blocks of code; like a "function" that, instead
+   of returning a value, directly generates CSS. They are invoked with
+   @include.
+  ══════════════════════════════════════════════════════════════════*/
+/*─── 2) Mixin with arguments and "default values" ───
+  If an argument is omitted at the call site, its default value is used.
+  "Named" call: @include bordered($color: red, $width: 2px) */
+/*─── 3) Variable arguments with ... ───
+  Accepts any number of arguments and packs them into the $shadows list. */
+/*─── 4) Content block with @content ───
+  Any code written between { } at the call site lands exactly where
+  @content sits. Its most common use case is responsive media queries.
+  (Advanced: @content($args) plus `@include ... using ($args)` can pass values back out.) */
+/*`as v` shortens the namespace — members are then accessed as v.$theme.
+  (This namespaced access is the standard alternative to `as *`.) */
+/*══════════════════════════════════════════════════════════════════
+   Custom Functions — @function and @return
+  ══════════════════════════════════════════════════════════════════
+   Unlike a mixin (which generates CSS), a function "returns a value"
+   (with @return) that can be used in calculations and properties.
+  ══════════════════════════════════════════════════════════════════*/
+/*─── Convert pixels to rem ───
+  Important: the division operator (/) is deprecated in modern Sass;
+  division must be done with math.div */
+/*─── Read a color from the $theme map ───
+  If the key does not exist, it emits a @warn (compilation continues)
+  and returns a fallback value. Functions can contain @if. */
+/*══════════════════════════════════════════════════════════════════
+   Placeholders — made for @extend
+  ══════════════════════════════════════════════════════════════════
+   Placeholders are defined with % and never appear in the CSS output
+   on their own; their styles are transferred only to the classes that
+   @extend them. Advantage over extending a regular class: your HTML
+   does not need an extra class.
+  ══════════════════════════════════════════════════════════════════*/
+.btn-primary, .btn-success, .btn-danger {
+  display: inline-block;
+  padding: 10px 28px;
+  font-size: 1rem;
+  font-family: inherit;
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.card-item {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.scope-demo, .interp-demo, .operators, .condition-demo, .custom-function-demo {
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  display: inline-block;
+}
+
+/*══════════════════════════════════════════════════════════════════
+   Partial file
+  ══════════════════════════════════════════════════════════════════
+   Files whose name starts with _ are called Partials; they are never
+   compiled to CSS on their own — they exist only to be @used by other
+   files.
+  ══════════════════════════════════════════════════════════════════*/
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+h1, h2, h3,
+p,
+ul, ol {
+  margin: 0;
+  padding: 0;
+}
+
+ul, ol {
+  list-style: none;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  font-family: inherit;
+}
+
+img {
+  max-width: 100%;
+}
+
+/*══════════════════════════════════════════════════════════════════
+  3) Debugging — @debug, @warn and @error
+  ══════════════════════════════════════════════════════════════════
+  @debug prints a value to the terminal while compiling (compilation continues).
+  Watch the terminal output when you compile: */
+/*@warn only prints a warning and compilation continues;
+  a real example lives in the theme-color function (_functions.scss). */
+/*@error halts compilation right there; see the mixin below.
+  (This mixin is intentionally never called so compilation does not stop!) */
+/*══════════════════════════════════════════════════════════════════
+  4) Variables: usage, scope and the !global flag
+  ══════════════════════════════════════════════════════════════════
+  The variables themselves are defined in _variables.scss (loaded in section 2).
+  Scope rule: a variable defined inside a selector is visible only inside that
+  block. To overwrite a previously defined global variable inside a block, use
+  !global (in modern Sass, !global cannot create a brand-new global variable). */
+.scope-demo {
+  color: #8e44ad;
+  border: 2px dotted currentColor;
+}
+
+/*══════════════════════════════════════════════════════════════════
+  5) Nesting, the parent selector & and nested properties
+  ══════════════════════════════════════════════════════════════════*/
+/*─── Nested properties ───
+  The font: block with a trailing colon equals font-family / font-size / font-weight. */
+body {
+  font-family: "Vazirmatn", Tahoma, sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.7;
+}
+
+/*─── Nested selectors mirroring the HTML structure ───
+  This block produces nav ul, nav li, nav a, nav a:hover and nav a.is-active. */
+nav {
+  background-color: #3498db;
+  border-radius: 10px 10px 0 0;
+  padding: 0.5rem 1rem;
+}
+nav ul {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+nav li {
+  display: inline-block;
+}
+nav a {
+  display: inline-block;
+  color: rgba(255, 255, 255, 0.9);
+  padding: 0.5rem 0.9rem;
+  border-radius: 6px;
+  transition: all 0.25s ease;
+}
+nav a:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+nav a.is-active {
+  background-color: #ffffff;
+  color: #3498db;
+  font-weight: 700;
+}
+
+.demo-item {
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+}
+.alert-list .demo-item {
+  border-inline-start: 4px solid #2ecc71;
+}
+.demo-item + .demo-item {
+  margin-top: 0.75rem;
+}
+
+/*══════════════════════════════════════════════════════════════════
+  6) Interpolation with #{}
+  ══════════════════════════════════════════════════════════════════
+   Use #{} whenever a "value" must go inside a selector name, a property
+   name, a property value or a string. (Inside plain property values the
+   variable alone is enough.) */
+.interp-demo {
+  margin-right: 1.5rem;
+  border-radius: 10px;
+}
+.interp-demo::after {
+  content: "شعاع گوشه‌ها: 10px";
+  display: block;
+  font-size: 0.85rem;
+  color: #7f8c8d;
+}
+
+/*══════════════════════════════════════════════════════════════════
+  7) Operators
+  ══════════════════════════════════════════════════════════════════
+   Arithmetic:   +   -   *   %          (the / divider is deprecated; use math.div)
+   Comparison:   ==  !=  <   >   <=  >=  (used in section 8)
+   Logical:      and   or   not          (used in section 8)
+   + also concatenates two strings (example at the bottom of the block below).
+   Note: math on colors such as #111 + #333 is deprecated; use sass:color instead. */
+.operators {
+  width: 600px;
+  max-width: 100%;
+  font-size: 18px;
+  line-height: 1.75;
+  padding: 12px;
+  z-index: 15;
+  opacity: 0.9;
+}
+.operators::after {
+  content: "این رشته با عملگر + چسبیده شده: Sass";
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: #7f8c8d;
+}
+
+/*══════════════════════════════════════════════════════════════════
+  8) Conditions — @if / @else if / @else, and the one-line if() function
+  ══════════════════════════════════════════════════════════════════*/
+:root {
+  --page-bg: #eef1f6;
+  --page-text: #333333;
+}
+
+body {
+  background-color: var(--page-bg);
+  color: var(--page-text);
+}
+
+.condition-demo {
+  letter-spacing: 0.3px;
+  border: 1px solid #d5dbe3;
+  /*The one-line if() function directly returns a value.
+    NOTE: the classic syntax if($condition, $a, $b) is DEPRECATED since Sass 1.105;
+    the modern form below uses the CSS-native if() with a sass() condition,
+    and Sass still resolves it at compile time: */
+  outline: 1px dashed #b3bac6;
+}
+
+/*══════════════════════════════════════════════════════════════════
+  9) The @for loop — counted repetition
+  ══════════════════════════════════════════════════════════════════
+   "from 1 through 5" → 1, 2, 3, 4, 5   (5 is included)
+   "from 1 to 5"      → 1, 2, 3, 4      (5 is excluded) */
+.mt-1 {
+  margin-top: 0.5rem;
+}
+
+.mt-2 {
+  margin-top: 1rem;
+}
+
+.mt-3 {
+  margin-top: 1.5rem;
+}
+
+.mt-4 {
+  margin-top: 2rem;
+}
+
+.mt-5 {
+  margin-top: 2.5rem;
+}
+
+.col-1 {
+  width: 25%;
+}
+
+.col-2 {
+  width: 50%;
+}
+
+.col-3 {
+  width: 75%;
+}
+
+.col-4 {
+  width: 100%;
+}
+
+.order-1 {
+  order: 1;
+}
+
+.order-2 {
+  order: 2;
+}
+
+/*══════════════════════════════════════════════════════════════════
+  10) The @each loop — iterating lists and maps
+  ══════════════════════════════════════════════════════════════════*/
+.icon-html::before {
+  content: "html";
+}
+
+.icon-css::before {
+  content: "css";
+}
+
+.icon-sass::before {
+  content: "sass";
+}
+
+/*b) Over a map (key, value) — the most useful form;
+  every color utility class on this page comes from just these few lines: */
+.text-primary {
+  color: #3498db;
+}
+
+.bg-primary {
+  background-color: #3498db;
+}
+
+.text-success {
+  color: #2ecc71;
+}
+
+.bg-success {
+  background-color: #2ecc71;
+}
+
+.text-warning {
+  color: #f39c12;
+}
+
+.bg-warning {
+  background-color: #f39c12;
+}
+
+.text-danger {
+  color: #e74c3c;
+}
+
+.bg-danger {
+  background-color: #e74c3c;
+}
+
+.p-sm {
+  padding: 8px;
+}
+
+.p-md {
+  padding: 16px;
+}
+
+.p-lg {
+  padding: 24px;
+}
+
+/*d) Generating CSS custom properties. Important rule: custom property values are
+  NOT parsed as SassScript — only #{} interpolation is evaluated inside them: */
+.theme-vars {
+  --color-primary: #3498db;
+  --color-success: #2ecc71;
+  --color-warning: #f39c12;
+  --color-danger: #e74c3c;
+}
+
+/*══════════════════════════════════════════════════════════════════
+  11) The @while loop — repeat as long as the condition holds
+  ══════════════════════════════════════════════════════════════════
+   You must change the condition inside the loop, otherwise it runs forever! */
+.zoom-1 {
+  font-size: 20px;
+}
+
+.zoom-2 {
+  font-size: 24px;
+}
+
+.zoom-3 {
+  font-size: 28px;
+}
+
+/*══════════════════════════════════════════════════════════════════
+  12) Calling mixins — definitions live in _mixins.scss
+  ══════════════════════════════════════════════════════════════════*/
+.article-card {
+  border: 1px solid #999999;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 4px 10px rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
+  padding: 1rem;
+  background-color: #ffffff;
+}
+
+.note-box {
+  border: 2px solid #f39c12;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  background-color: rgb(99.4352941176%, 95.3411764706%, 88.8470588235%);
+}
+
+.responsive-box {
+  display: flex;
+  gap: 1rem;
+  padding: 1.25rem;
+  background-color: #ffffff;
+  border-radius: 10px;
+}
+@media (max-width: 768px) {
+  .responsive-box {
+    flex-direction: column;
+  }
+}
+.responsive-box > * {
+  background-color: #eef2f9;
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+}
+
+.supports-demo {
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  background-color: #ffffff;
+  border: 1px dashed #2ecc71;
+}
+@supports (backdrop-filter: blur(4px)) {
+  .supports-demo {
+    backdrop-filter: blur(4px);
+    background-color: rgba(255, 255, 255, 0.65);
+  }
+}
+
+.prefix-demo {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+  -webkit-transition: color 0.2s;
+  -moz-transition: color 0.2s;
+  transition: color 0.2s;
+  color: #3498db;
+}
+.prefix-demo:hover {
+  color: rgb(11.4890475018%, 43.4030683403%, 64.7854623021%);
+}
+
+.badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  font-weight: 700;
+  background-color: #2ecc71;
+  color: #ffffff;
+}
+
+/*══════════════════════════════════════════════════════════════════
+  13) Inheritance — @extend and placeholders
+  ══════════════════════════════════════════════════════════════════
+   @extend inherits another selector's styles "by grouping selectors in
+   the output". Look at css/style.css: the selectors are comma-grouped! */
+.btn-primary {
+  background-color: #3498db;
+}
+.btn-primary:hover {
+  background-color: rgb(12.9953236525%, 49.0934449093%, 73.2791861514%);
+}
+
+.btn-success {
+  background-color: #2ecc71;
+}
+.btn-success:hover {
+  background-color: rgb(14.3592156863%, 63.68%, 35.2737254902%);
+}
+
+.btn-danger {
+  background-color: #e74c3c;
+}
+.btn-danger:hover {
+  background-color: rgb(83.8033843674%, 17.190437819%, 10.3142626914%);
+}
+
+.card-item {
+  transition: all 0.25s ease;
+}
+.card-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+/*─── Extending a "regular class" also works ───
+  (but a placeholder gives cleaner output, because .message simply gets grouped) */
+.message, .message-warning, .message-info {
+  display: block;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  border-inline-start: 4px solid #999999;
+  background-color: #ffffff;
+}
+
+.message-info {
+  border-inline-start-color: #3498db;
+}
+
+.message-warning {
+  border-inline-start-color: #f39c12;
+  background-color: rgb(99.2941176471%, 94.1764705882%, 86.0588235294%);
+}
+
+/*══════════════════════════════════════════════════════════════════
+  14) Built-in Sass functions (built-in modules)
+  ══════════════════════════════════════════════════════════════════*/
+.builtin-demo {
+  display: block;
+  margin-top: 0.75rem;
+  padding: 1.25rem;
+  background-color: #ffffff;
+  border-radius: 10px;
+  color: rgb(8.4764952006%, 32.0223152022%, 47.7980146033%);
+  border: 2px solid #cb6724;
+  outline: 4px solid rgb(95.2941176471%, 64.9019607843%, 61.7647058824%);
+  outline-offset: 4px;
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.25);
+  width: 303px;
+  max-width: 100%;
+  line-height: 1.6;
+  font-family: sans-serif;
+}
+.builtin-demo::before {
+  content: "SASS";
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #e74c3c;
+}
+.builtin-demo {
+  padding-block: 10px;
+  margin-block: 20px;
+  font-size: 16px;
+}
+
+/*══════════════════════════════════════════════════════════════════
+  15) Custom functions — defined in _functions.scss
+  ══════════════════════════════════════════════════════════════════*/
+.custom-function-demo {
+  font-size: 1.125rem;
+  width: 75%;
+  min-height: 60px;
+  color: #f39c12;
+}
+
+/*══════════════════════════════════════════════════════════════════
+  16) @at-root — jump to the document root
+  ══════════════════════════════════════════════════════════════════
+   Rules inside @at-root are emitted without their parent selectors.
+   The result in CSS is .escaped-selector, NOT .features .at-root-demo .escaped-selector
+   (@at-root (without: media) can additionally be told which nesting kinds to escape.) */
+.features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+}
+.features .at-root-demo {
+  color: #3498db;
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 1rem;
+}
+.escaped-selector {
+  display: inline-block;
+  margin-top: 0.5rem;
+  border: 2px dashed #f39c12;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  background-color: #ffffff;
+}
+
+/*══════════════════════════════════════════════════════════════════
+  17) Demo page layout (just makes the examples render nicely in HTML)
+  ══════════════════════════════════════════════════════════════════*/
+.container {
+  max-width: 720px;
+  margin-inline: auto;
+  padding-inline: 1rem;
+}
+
+h1, h2, h3 {
+  color: #e67e22;
+  line-height: 1.4;
+}
+
+h1 {
+  font-size: 1.875rem;
+  margin-top: 1.5rem;
+}
+
+h2 {
+  font-size: 1.375rem;
+  margin-top: 2.25rem;
+  margin-bottom: 1rem;
+}
+
+h3 {
+  font-size: 1.125rem;
+  margin-bottom: 0.5rem;
+}
+
+main {
+  padding-bottom: 4rem;
+}
+
+p {
+  margin-bottom: 0.75rem;
+}
+
+.code-hint {
+  direction: ltr;
+  display: inline-block;
+  font-family: Consolas, monospace;
+  font-size: 0.85rem;
+  color: #7f8c8d;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.swatch {
+  color: #ffffff;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  direction: ltr;
+  font-family: Consolas, monospace;
+  font-size: 0.85rem;
+}
+
+.text-colors span {
+  font-family: Consolas, monospace;
+  direction: ltr;
+  margin-inline-end: 1.25rem;
+}
+
+.spacing-demo {
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 1rem;
+}
+.spacing-demo p {
+  margin-bottom: 0;
+}
+.spacing-demo .code-hint {
+  margin-inline-end: 0.5rem;
+}
+
+.footer {
+  margin-top: 3rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid #d5dbe3;
+  color: #7f8c8d;
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+/*# sourceMappingURL=style.css.map */

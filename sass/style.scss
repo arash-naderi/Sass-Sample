@@ -1,0 +1,602 @@
+/*╔══════════════════════════════════════════════════════════════════╗
+  ║          The Complete Sass Guide — Every Rule Explained          ║
+  ╚══════════════════════════════════════════════════════════════════╝
+   Auto-recompile on save:          npm run sass:watch
+   The .scss syntax is standard; the old .sass syntax (no braces/semicolons) is deprecated.
+
+   Table of contents:
+    1) Comments                     2) @use + module config with with    3) Debugging @debug/@warn/@error
+    4) Variables, scope & !global   5) Nesting & the & selector          6) Interpolation ##{"{}"}
+    7) Operators                    8) Conditions @if / @else + if()     9) The @for loop
+   10) The @each loop              11) The @while loop                  12) Calling mixins
+   13) @extend & placeholders      14) Built-in Sass functions          15) Custom functions
+   16) @at-root                    17) Demo page layout */
+
+/*══════════════════════════════════════════════════════════════════
+  1) Comments
+  ══════════════════════════════════════════════════════════════════
+  Double-slash comments are visible "only in the Sass file" and are removed from the CSS output. */
+/* Regular CSS comments stay in the output too (good for licenses / important notes). */
+
+/*══════════════════════════════════════════════════════════════════
+  2) @use — loading modules (the modern replacement for @import)
+  ══════════════════════════════════════════════════════════════════
+   • The old @import is deprecated in modern Sass; @use replaces it.
+   • @use turns a file into a "module": each file is loaded only once, and its
+     variables/mixins/functions are available under the file-name prefix (namespace).
+   • `as` gives the module a shorter name; `as *` means use its members "without a prefix".
+   • `with` lets you set the module's !default variables at load time
+     (this is called "configuring a module"). Here $container-width changes from 960px to 720px: */
+@use "abstracts" as * with ($container-width: 720px);
+@use "placeholders";   // only to make the %placeholders available
+@use "reset";
+
+//  Built-in modules that ship with Sass itself:
+@use "sass:math";      // math functions:   math.div, math.round, math.clamp, ...
+@use "sass:color";     // color functions:  color.adjust, color.mix, color.invert, ...
+@use "sass:string";    // string functions: string.to-upper-case, string.slice, ...
+@use "sass:list";      // list functions:   list.nth, list.length, ...
+@use "sass:map";       // map functions:    map.get, map.keys, map.has-key, ...
+@use "sass:meta";      // meta tools:       meta.type-of, meta.inspect, ...
+//  (A seventh module, sass:selector, also exists — selector.nest, selector.append — but is rarely needed.)
+
+/*══════════════════════════════════════════════════════════════════
+  3) Debugging — @debug, @warn and @error
+  ══════════════════════════════════════════════════════════════════
+  @debug prints a value to the terminal while compiling (compilation continues).
+  Watch the terminal output when you compile: */
+@debug "Number of colors in the theme map: #{list.length(map.keys($theme))}";
+@debug "Data type of $theme: #{meta.type-of($theme)}";
+
+/*@warn only prints a warning and compilation continues;
+  a real example lives in the theme-color function (_functions.scss). */
+
+/*@error halts compilation right there; see the mixin below.
+  (This mixin is intentionally never called so compilation does not stop!) */
+@mixin assert-positive($name, $value) {
+  @if $value < 0 {
+    @error "#{$name} must not be negative! (got #{$value})";
+  }
+}
+
+/*══════════════════════════════════════════════════════════════════
+  4) Variables: usage, scope and the !global flag
+  ══════════════════════════════════════════════════════════════════
+  The variables themselves are defined in _variables.scss (loaded in section 2).
+  Scope rule: a variable defined inside a selector is visible only inside that
+  block. To overwrite a previously defined global variable inside a block, use
+  !global (in modern Sass, !global cannot create a brand-new global variable). */
+
+$heading-color: #2c3e50; // global variable of this file
+
+.scope-demo {
+  @extend %box;
+  $local-color: #8e44ad;            // local variable — unknown outside this block
+  $heading-color: #e67e22 !global;  // the "global" value becomes orange from this point on
+
+  color: $local-color;
+  border: 2px dotted currentColor;
+
+  // (Check the page headings: they are orange because the !global above already ran!)
+}
+
+/*══════════════════════════════════════════════════════════════════
+  5) Nesting, the parent selector & and nested properties
+  ══════════════════════════════════════════════════════════════════*/
+
+/*─── Nested properties ───
+  The font: block with a trailing colon equals font-family / font-size / font-weight. */
+body {
+  font: {
+    family: $font-stack;
+    size: $base-font-size;
+    weight: 400;
+  }
+  line-height: $base-line-height;
+}
+
+/*─── Nested selectors mirroring the HTML structure ───
+  This block produces nav ul, nav li, nav a, nav a:hover and nav a.is-active. */
+nav {
+  background-color: theme-color("primary");
+  border-radius: $radius $radius 0 0;
+  padding: 0.5rem 1rem;
+
+  ul {
+    @include flex-center;   // ← calling a mixin without arguments
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  li { display: inline-block; }
+
+  a {
+    display: inline-block;
+    color: rgba(255, 255, 255, 0.9);
+    padding: 0.5rem 0.9rem;
+    border-radius: 6px;
+    transition: $transition;
+
+    // & refers to the "parent selector"; here it means a:hover
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+    }
+
+    // &.class  →  a.is-active
+    &.is-active {
+      background-color: #ffffff;
+      color: theme-color("primary");
+      font-weight: 700;
+    }
+  }
+}
+
+// ─── & can also sit in the middle of a selector, or repeat ───
+.demo-item {
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+
+  // & in the middle → .alert-list .demo-item (the outer parent selector)
+  .alert-list & {
+    border-inline-start: 4px solid theme-color("success");
+  }
+
+  // & + & → .demo-item + .demo-item (gap between siblings)
+  & + & {
+    margin-top: 0.75rem;
+  }
+}
+
+/*══════════════════════════════════════════════════════════════════
+  6) Interpolation with ##{"{}"}
+  ══════════════════════════════════════════════════════════════════
+   Use ##{"{}"} whenever a "value" must go inside a selector name, a property
+   name, a property value or a string. (Inside plain property values the
+   variable alone is enough.) */
+
+$side: right; // this page is RTL
+
+.interp-demo {
+  @extend %box;
+  margin-#{$side}: 1.5rem;        // builds the property name: margin-right
+  border-radius: #{$radius};      // property value via interpolation
+
+  &::after {
+    content: "شعاع گوشه‌ها: #{$radius}";   // inside a string
+    display: block;
+    font-size: 0.85rem;
+    color: #7f8c8d;
+  }
+}
+
+/*══════════════════════════════════════════════════════════════════
+  7) Operators
+  ══════════════════════════════════════════════════════════════════
+   Arithmetic:   +   -   *   %          (the / divider is deprecated; use math.div)
+   Comparison:   ==  !=  <   >   <=  >=  (used in section 8)
+   Logical:      and   or   not          (used in section 8)
+   + also concatenates two strings (example at the bottom of the block below).
+   Note: math on colors such as #111 + #333 is deprecated; use sass:color instead. */
+
+.operators {
+  @extend %box;
+  width: $container-width - 120px;              // subtraction with matching units → 600px
+  max-width: 100%;
+  font-size: $base-font-size + 2px;             // 18px
+  line-height: math.div(28px, $base-font-size); // division via math.div → 1.75
+  padding: math.div(24px, 2);                   // 12px
+  z-index: 10 + 5;                              // 15 (unitless)
+  opacity: math.div(9, 10);                     // 0.9
+
+  // String concatenation with +: if either side has quotes, the result is quoted.
+  &::after {
+    content: "این رشته با عملگر + چسبیده شده: " + "Sass";
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    color: #7f8c8d;
+  }
+}
+
+/*══════════════════════════════════════════════════════════════════
+  8) Conditions — @if / @else if / @else, and the one-line if() function
+  ══════════════════════════════════════════════════════════════════*/
+$theme-mode: light; // change this to dark and recompile!
+
+:root {
+  @if $theme-mode == light {
+    // In Sass, strings may be unquoted: light == "light" is true
+    --page-bg: #eef1f6;
+    --page-text: #333333;
+  } @else if $theme-mode == dark {
+    --page-bg: #1b1b2f;
+    --page-text: #eeeeee;
+  } @else {
+    --page-bg: #ffffff;
+    --page-text: #000000;
+  }
+}
+
+body {
+  background-color: var(--page-bg);
+  color: var(--page-text);
+}
+
+.condition-demo {
+    @extend %box;
+    // Comparison and logical operators (and / or / not) inside a condition:
+    @if $base-font-size >= 16px and not $is-dark {
+        letter-spacing: 0.3px; // large font and light theme → a little letter spacing
+    }
+    @else {
+        letter-spacing: 0;
+    }
+    // A second condition picks the border color:
+    @if $theme-mode == light {
+        border: 1px solid #d5dbe3;
+    }
+    @else {
+        border: 1px solid #3a3a55;
+    }
+    /*The one-line if() function directly returns a value.
+      NOTE: the classic syntax if($condition, $a, $b) is DEPRECATED since Sass 1.105;
+      the modern form below uses the CSS-native if() with a sass() condition,
+      and Sass still resolves it at compile time: */
+    outline: 1px dashed if(sass($theme-mode == light): #b3bac6; else: #4a4a6a);
+}
+
+/*══════════════════════════════════════════════════════════════════
+  9) The @for loop — counted repetition
+  ══════════════════════════════════════════════════════════════════
+   "from 1 through 5" → 1, 2, 3, 4, 5   (5 is included)
+   "from 1 to 5"      → 1, 2, 3, 4      (5 is excluded) */
+
+// Each iteration builds a spacing utility class: mt-1 up to mt-5
+@for $i from 1 through 5 {
+  .mt-#{$i} { margin-top: $i * 0.5rem; }   // interpolation inside a "selector name"
+}
+
+// Grid column widths: col-1 is one quarter, col-4 is full width
+@for $i from 1 through 4 {
+  .col-#{$i} { width: math.percentage(math.div($i, 4)); }
+}
+
+// A `to` example: only 1 and 2 → order-1 and order-2
+@for $i from 1 to 3 {
+  .order-#{$i} { order: $i; }
+}
+
+/*══════════════════════════════════════════════════════════════════
+  10) The @each loop — iterating lists and maps
+  ══════════════════════════════════════════════════════════════════*/
+
+// a) Over a simple list:
+@each $icon in (html, css, sass) {
+  .icon-#{$icon}::before { content: "#{$icon}"; }
+}
+
+/*b) Over a map (key, value) — the most useful form;
+  every color utility class on this page comes from just these few lines: */
+@each $name, $hex in $theme {
+  .text-#{$name} { color: $hex; }
+  .bg-#{$name}   { background-color: $hex; }
+}
+
+// c) Over a list of "sub-lists" (each member is itself a pair):
+@each $name, $value in (("sm", 8px), ("md", 16px), ("lg", 24px)) {
+  .p-#{$name} { padding: $value; }
+}
+
+/*d) Generating CSS custom properties. Important rule: custom property values are
+  NOT parsed as SassScript — only ##{"{}"} interpolation is evaluated inside them: */
+.theme-vars {
+  @each $name, $hex in $theme {
+    --color-#{$name}: #{$hex};
+  }
+}
+
+/*══════════════════════════════════════════════════════════════════
+  11) The @while loop — repeat as long as the condition holds
+  ══════════════════════════════════════════════════════════════════
+   You must change the condition inside the loop, otherwise it runs forever! */
+$step: 1;
+@while $step <= 3 {
+  .zoom-#{$step} {
+    font-size: $base-font-size * (1 + math.div($step, 4)); // 20px, then 24px, then 28px
+  }
+  $step: $step + 1;   // advance the counter
+}
+
+/*══════════════════════════════════════════════════════════════════
+  12) Calling mixins — definitions live in _mixins.scss
+  ══════════════════════════════════════════════════════════════════*/
+
+// Mixin with (default) arguments + variable arguments ...:
+.article-card {
+  @include bordered;   // → border: 1px solid #999999
+  @include multi-shadow(0 1px 3px rgba(0, 0, 0, 0.12), 0 4px 10px rgba(0, 0, 0, 0.08));
+  border-radius: $radius;
+  padding: 1rem;
+  background-color: #ffffff;
+}
+
+// "Named" arguments (their order no longer matters):
+.note-box {
+  @include bordered($color: theme-color("warning"), $width: 2px);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  background-color: color.mix(#ffffff, theme-color("warning"), 88%);
+}
+
+// @content and media queries — narrow the browser window below 768px:
+.responsive-box {
+  display: flex;
+  gap: 1rem;
+  padding: 1.25rem;
+  background-color: #ffffff;
+  border-radius: $radius;
+
+  @include breakpoint(768px) {
+    flex-direction: column;   // this block lands exactly where @content sits in the mixin
+  }
+
+  > * {
+    background-color: #eef2f9;
+    border-radius: 8px;
+    padding: 1rem;
+    text-align: center;
+  }
+}
+
+// Other CSS at-rules such as @supports nest and accept SassScript just like @media:
+.supports-demo {
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  background-color: #ffffff;
+  border: 1px dashed theme-color("success");
+
+  @supports (backdrop-filter: blur(4px)) {
+    backdrop-filter: blur(4px);
+    background-color: rgba(255, 255, 255, 0.65);
+  }
+}
+
+// The prefix mixin uses interpolation in property names:
+.prefix-demo {
+  @include prefix(user-select, none);
+  @include prefix(transition, color 0.2s);
+  color: theme-color("primary");
+
+  &:hover { color: color.adjust(theme-color("primary"), $lightness: -15%); }
+}
+
+// Round badge — a mixin that itself calls another mixin:
+.badge {
+  @include round-badge(56px);
+  background-color: theme-color("success");
+  color: #ffffff;
+}
+
+/*══════════════════════════════════════════════════════════════════
+  13) Inheritance — @extend and placeholders
+  ══════════════════════════════════════════════════════════════════
+   @extend inherits another selector's styles "by grouping selectors in
+   the output". Look at css/style.css: the selectors are comma-grouped! */
+
+// ─── Extending the %button placeholder ───
+.btn-primary {
+  @extend %button;
+  background-color: theme-color("primary");
+  &:hover { background-color: color.adjust(theme-color("primary"), $lightness: -10%); }
+}
+
+.btn-success {
+  @extend %button;
+  background-color: theme-color("success");
+  &:hover { background-color: color.adjust(theme-color("success"), $lightness: -10%); }
+}
+
+.btn-danger {
+  @extend %button !optional;   // the !optional flag: do not error if the selector is missing
+  background-color: theme-color("danger");
+  &:hover { background-color: color.adjust(theme-color("danger"), $lightness: -10%); }
+}
+
+// ─── Extending the %card placeholder ───
+.card-item {
+  @extend %card;
+  transition: $transition;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  }
+}
+
+/*─── Extending a "regular class" also works ───
+  (but a placeholder gives cleaner output, because .message simply gets grouped) */
+.message {
+  display: block;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  border-inline-start: 4px solid #999999;
+  background-color: #ffffff;
+}
+
+.message-info {
+  @extend .message;
+  border-inline-start-color: theme-color("primary");
+}
+
+.message-warning {
+  @extend .message;
+  border-inline-start-color: theme-color("warning");
+  background-color: color.mix(#ffffff, theme-color("warning"), 85%);
+}
+
+/*══════════════════════════════════════════════════════════════════
+  14) Built-in Sass functions (built-in modules)
+  ══════════════════════════════════════════════════════════════════*/
+.builtin-demo {
+  display: block;
+  margin-top: 0.75rem;
+  padding: 1.25rem;
+  background-color: #ffffff;
+  border-radius: $radius;
+
+  // ─── sass:color ───
+  color: color.adjust(theme-color("primary"), $lightness: -25%);     // darken a color
+  border: 2px solid color.invert(theme-color("primary"));            // inverse color
+  outline: 4px solid color.mix(#ffffff, theme-color("danger"), 50%); // blend two colors
+  outline-offset: 4px;
+  box-shadow: 0 4px 12px rgba(theme-color("primary"), 0.25);         // rgba(color, alpha)
+  // color.scale, color.complement, color.grayscale and color.alpha also exist.
+
+  // ─── sass:math ───
+  width: math.round(math.div(910px, 3));    // rounding → 303px
+  max-width: 100%;
+  line-height: math.clamp(1.2, 1.6, 1.8);   // keep a number between two bounds
+  // math.floor, math.ceil, math.abs, math.min, math.max, math.sqrt and math.pow also exist.
+
+  // ─── sass:string ───
+  font-family: $string-free;   // unquoted string from the variables
+  &::before {
+    content: string.to-upper-case("sass");   // → "SASS"
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: theme-color("danger");
+  }
+  // string.length, string.slice, string.index and string.quote also exist.
+
+  // ─── sass:list ───
+  padding-block: list.nth($box-padding, 1);   // first list member → 10px
+  margin-block: list.nth($box-padding, 2);    // second list member → 20px
+  // list.length returns the member count (used in the @debug section).
+
+  // ─── sass:map ───
+  font-size: map.get($sizes, "md");           // value of the "md" key → 16px
+  // map.keys, map.values, map.has-key, map.merge and map.set also exist.
+}
+
+/*══════════════════════════════════════════════════════════════════
+  15) Custom functions — defined in _functions.scss
+  ══════════════════════════════════════════════════════════════════*/
+.custom-function-demo {
+  @extend %box;
+  font-size: px-to-rem(18px);   // 1.125rem — px→rem via a custom function
+  width: percent(3, 4);         // 75%      — percentage calculation
+  min-height: double(30px);     // 60px     — doubling
+  color: theme-color("warning");
+}
+
+/*══════════════════════════════════════════════════════════════════
+  16) @at-root — jump to the document root
+  ══════════════════════════════════════════════════════════════════
+   Rules inside @at-root are emitted without their parent selectors.
+   The result in CSS is .escaped-selector, NOT .features .at-root-demo .escaped-selector
+   (@at-root (without: media) can additionally be told which nesting kinds to escape.) */
+.features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+
+  .at-root-demo {
+    color: theme-color("primary");
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 1rem;
+
+    @at-root .escaped-selector {
+      display: inline-block;
+      margin-top: 0.5rem;
+      border: 2px dashed theme-color("warning");
+      border-radius: 8px;
+      padding: 0.5rem 1rem;
+      background-color: #ffffff;
+    }
+  }
+}
+
+/*══════════════════════════════════════════════════════════════════
+  17) Demo page layout (just makes the examples render nicely in HTML)
+  ══════════════════════════════════════════════════════════════════*/
+.container {
+  max-width: $container-width;   // value configured with `with` in section 2 → 720px
+  margin-inline: auto;
+  padding-inline: 1rem;
+}
+
+h1, h2, h3 {
+  color: $heading-color;   // orange; because the !global in section 4 already ran
+  line-height: 1.4;
+}
+
+h1 { font-size: px-to-rem(30px); margin-top: 1.5rem; }
+h2 { font-size: px-to-rem(22px); margin-top: 2.25rem; margin-bottom: 1rem; }
+h3 { font-size: px-to-rem(18px); margin-bottom: 0.5rem; }
+
+main { padding-bottom: 4rem; }
+p { margin-bottom: 0.75rem; }
+
+.code-hint {
+  direction: ltr;
+  display: inline-block;
+  font-family: Consolas, monospace;
+  font-size: 0.85rem;
+  color: #7f8c8d;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.swatch {
+  color: #ffffff;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  direction: ltr;
+  font-family: Consolas, monospace;
+  font-size: 0.85rem;
+}
+
+.text-colors span {
+  font-family: Consolas, monospace;
+  direction: ltr;
+  margin-inline-end: 1.25rem;
+}
+
+.spacing-demo {
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 1rem;
+
+  p { margin-bottom: 0; }
+  .code-hint { margin-inline-end: 0.5rem; }
+}
+
+.footer {
+  margin-top: 3rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid #d5dbe3;
+  color: #7f8c8d;
+  font-size: px-to-rem(14px);
+  text-align: center;
+}

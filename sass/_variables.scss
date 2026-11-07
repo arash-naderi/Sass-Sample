@@ -1,0 +1,48 @@
+/*══════════════════════════════════════════════════════════════════
+   Variables and Data Types
+  ══════════════════════════════════════════════════════════════════
+   Variables start with a dollar sign ($) and take their value after
+   a colon (:). They can hold seven data types:
+     1) Number  → 16px or 1.5 (numbers can carry units)
+     2) String  → "Vazirmatn" or sans-serif (quoted or unquoted)
+     3) Color   → red, #3498db or rgb(52, 152, 219)
+     4) Boolean → only true or false
+     5) Null    → nothing; a property set to null is omitted from the CSS output
+     6) List    → 1px 2px 3px (separated by spaces or commas)
+     7) Map     → ("key": value, ...) similar to a JavaScript object
+  ══════════════════════════════════════════════════════════════════*/
+
+// ─── One sample of every data type ───
+$number: 1.5;                                   // number without unit
+$base-font-size: 16px;                          // number with unit
+$string-quoted: "Vazirmatn";                    // quoted string
+$string-free: sans-serif;                       // unquoted string
+$color-hex: #3498db;                            // hex color
+$color-rgb: rgb(46, 204, 113);                  // rgb color
+$color-hsl: hsl(120, 60%, 40%);                 // hsl color
+$is-dark: false;                                // boolean
+$nothing: null;                                 // null
+$font-stack: "Vazirmatn", Tahoma, sans-serif;   // comma-separated list
+$box-padding: 10px 20px;                        // space-separated list
+$sizes: ("sm": 8px, "md": 16px, "lg": 24px);    // map (key: value)
+
+// ─── Main project variables ───
+$text-color: #333333;
+$base-line-height: 1.7;
+$radius: 10px;
+$transition: all 0.25s ease;
+
+// ─── Theme color map; the @each loop generates the color utility classes from it ───
+$theme: (
+  "primary": #3498db,
+  "success": #2ecc71,
+  "warning": #f39c12,
+  "danger":  #e74c3c,
+);
+
+/*─── The !default flag ───
+  Assigns this value only if the variable is not already defined
+  or its current value is null; otherwise, keeps the existing value.
+  This allows the variable to be overridden using `@use ... with`
+  (e.g. style.scss overrides $container-width to 720px). */
+$container-width: 960px !default;

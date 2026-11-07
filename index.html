@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>راهنمای کامل Sass | با توضیحات فارسی</title>
+    <!-- Vazirmatn Persian font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Compiled output of sass/style.scss -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- ▼ Section 5: nesting (nav ul, nav a, nav a:hover, nav a.is-active) -->
+    <nav>
+        <ul>
+            <li><a href="#" class="is-active">خانه</a></li>
+            <li><a href="#extend">@extend</a></li>
+            <li><a href="#loops">حلقه‌ها</a></li>
+            <li><a href="#functions">توابع</a></li>
+        </ul>
+    </nav>
+
+    <main class="container">
+
+        <h1>راهنمای کامل Sass</h1>
+        <p>
+            تمام قوانین و امکانات Sass در فایل‌های پوشه‌ی <span class="code-hint">sass/</span>
+            با توضیحات آمده است و این صفحه خروجی زنده‌ی همان فایل‌هاست.
+        </p>
+
+        <!-- ▼ Section 4: variables, scope & !global -->
+        <h2>۴) متغیرها، دامنه (Scope) و !global</h2>
+        <span class="scope-demo">
+            رنگ متن این جعبه از متغیر «محلی» و رنگ حاشیه از متغیر سراسری می‌آید.
+        </span>
+
+        <!-- ▼ Sections 6 & 7: interpolation #{} and operators -->
+        <h2>۶) درون‌یابی #{} و ۷) عملگرها</h2>
+        <span class="interp-demo">
+            حاشیه‌ی سمت راست این جعبه با درون‌یابی در «نام خاصیت» ساخته شده است.
+        </span>
+        <div class="operators mt-2">
+            عرض، اندازه‌ی متن، ارتفاع خط و شفافیت این جعبه با عملگرهای
+            + - * و math.div محاسبه شده است.
+        </div>
+
+        <!-- ▼ Section 8: conditions -->
+        <h2>۸) شرط‌ها با @if و @else</h2>
+        <span class="condition-demo">
+            رنگ پس‌زمینه‌ی کل صفحه و رنگ حاشیه‌ی این جعبه با شرط‌های @if انتخاب شده است.
+        </span>
+
+        <!-- ▼ Section 13: placeholders & @extend -->
+        <h2 id="extend">۱۳) پلیس‌هولدرها و @extend</h2>
+        <div class="cards">
+            <article class="card-item">
+                <h3>%button</h3>
+                <p>پایه‌ی همه‌ی دکمه‌های زیر از یک پلیس‌هولدر به ارث رسیده است.</p>
+            </article>
+            <article class="card-item">
+                <h3>%card</h3>
+                <p>این کارت‌ها با <span class="code-hint">@extend %card</span> ساخته شده‌اند.</p>
+            </article>
+            <article class="card-item">
+                <h3>.message</h3>
+                <p>پیام‌های زیر از یک کلاس معمولی ارث‌بری می‌کنند (نه پلیس‌هولدر).</p>
+            </article>
+        </div>
+
+        <div class="buttons mt-2">
+            <button class="btn-primary">ثبت سفارش</button>
+            <button class="btn-success">تأیید</button>
+            <button class="btn-danger">حذف</button>
+        </div>
+
+        <div class="mt-2">
+            <span class="message-info">پیام اطلاع‌رسانی — ارث‌بری از کلاس .message</span>
+            <span class="message-warning mt-1">پیام هشدار — همان کلاس با رنگ دیگر</span>
+        </div>
+
+        <!-- ▼ Section 10: color classes generated with @each -->
+        <h2>۱۰) کلاس‌های رنگی تولیدشده با @each</h2>
+        <div class="swatches theme-vars">
+            <span class="swatch bg-primary">bg-primary</span>
+            <span class="swatch bg-success">bg-success</span>
+            <span class="swatch bg-warning">bg-warning</span>
+            <span class="swatch bg-danger">bg-danger</span>
+        </div>
+        <p class="text-colors mt-1">
+            <span class="text-primary">text-primary</span>
+            <span class="text-success">text-success</span>
+            <span class="text-warning">text-warning</span>
+            <span class="text-danger">text-danger</span>
+        </p>
+
+        <!-- ▼ Sections 9 & 11: @for and @while loops -->
+        <h2 id="loops">۹) حلقه‌ی @for و ۱۱) حلقه‌ی @while</h2>
+        <div class="spacing-demo">
+            <p class="mt-1"><span class="code-hint">mt-1</span> فاصله‌ی ۰٫۵rem — ساخته‌شده با @for از 1 through 5</p>
+            <p class="mt-2"><span class="code-hint">mt-2</span> فاصله‌ی ۱rem</p>
+            <p class="mt-3"><span class="code-hint">mt-3</span> فاصله‌ی ۱٫۵rem</p>
+            <p class="zoom-1"><span class="code-hint">zoom-1</span> اندازه‌ی متن ۲۰px — ساخته‌شده با @while</p>
+            <p class="zoom-2"><span class="code-hint">zoom-2</span> اندازه‌ی متن ۲۴px</p>
+            <p class="zoom-3"><span class="code-hint">zoom-3</span> اندازه‌ی متن ۲۸px</p>
+        </div>
+
+        <!-- ▼ Section 12: mixins (@mixin / @include) -->
+        <h2>۱۲) میکسین‌ها (@mixin و @include)</h2>
+        <div class="article-card">
+            این کارت دو میکسین را با هم دارد: <span class="code-hint">bordered</span>
+            (با آرگومان‌های پیش‌فرض) و <span class="code-hint">multi-shadow</span> (با آرگومان متغیر ...).
+        </div>
+        <p class="note-box mt-2">
+            فراخوانی «نامدار» آرگومان‌ها: <span class="code-hint">@include bordered($color: …, $width: 2px)</span>
+        </p>
+        <div class="responsive-box mt-2">
+            <div class="col-2">ستون ۱ — عرض ۵۰٪ از حلقه‌ی @for</div>
+            <div class="col-2">ستون ۲ — پنجره را باریک کنید تا @content فعال شود</div>
+        </div>
+        <div class="supports-demo mt-2">
+            این جعبه اتم‌رول @supports را نشان می‌دهد (اگر مرورگر backdrop-filter بفهمد، شیشه‌ای می‌شود).
+        </div>
+        <p class="prefix-demo mt-2">
+            user-select و transition این متن با میکسین prefix (درون‌یابی در نام خاصیت) ساخته شده‌اند.
+        </p>
+        <span class="badge mt-2">Sass</span>
+
+        <!-- ▼ Section 5 (continued): & in the middle of a selector & & + & -->
+        <h2>۵) سلکتور والد &amp; — وسط سلکتور و هم‌خانواده‌ها</h2>
+        <div class="alert-list">
+            <div class="demo-item">این جعبه‌ها هم‌خانواده‌اند؛ فاصله‌ی بین آنها با سلکتور <span class="code-hint">&amp; + &amp;</span> است.</div>
+            <div class="demo-item">حاشیه‌ی سبز این جعبه‌ها با <span class="code-hint">.alert-list &amp;</span> ساخته شده (وسط سلکتور).</div>
+        </div>
+
+        <!-- ▼ Sections 14 & 15: built-in & custom functions -->
+        <h2 id="functions">۱۴) توابع داخلی Sass و ۱۵) توابع سفارشی</h2>
+        <div class="builtin-demo">
+            رنگ متن با <span class="code-hint">color.adjust</span> ، حاشیه با
+            <span class="code-hint">color.invert</span> ، عرض با
+            <span class="code-hint">math.round</span> و اندازه‌ی فونت با
+            <span class="code-hint">map.get</span> محاسبه شده است.
+        </div>
+        <div class="custom-function-demo">
+            فونت و عرض این جعبه با توابع سفارشی <span class="code-hint">px-to-rem</span> و
+            <span class="code-hint">percent</span> و <span class="code-hint">double</span> ساخته شده است.
+        </div>
+
+        <!-- ▼ Section 16: @at-root -->
+        <h2>۱۶) @at-root</h2>
+        <div class="features">
+            <div class="at-root-demo">
+                سلکتور این جعبه والد دارد (features است)...
+                <span class="escaped-selector">...اما من با @at-root به ریشه رفتم!</span>
+            </div>
+        </div>
+
+        <footer class="footer">
+            راهنمای کامل Sass — برای دیدن توضیح هر قانون، کامنت‌های انگلیسی داخل <span class="code-hint">sass/style.scss</span> را بخوانید.
+        </footer>
+
+    </main>
+
+</body>
+</html>

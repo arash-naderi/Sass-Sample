@@ -1,0 +1,13 @@
+{
+  "name": "sass-project",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "sass": "sass sass/style.scss:css/style.css",
+    "sass:watch": "sass --watch sass/style.scss:css/style.css",
+    "sass:compressed": "sass --style=compressed --no-source-map sass/style.scss:css/style-compressed.css"
+  },
+  "devDependencies": {
+    "sass": "^1.105.1"
+  }
+}

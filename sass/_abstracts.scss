@@ -1,0 +1,14 @@
+/*══════════════════════════════════════════════════════════════════
+   @forward — re-exporting modules
+  ══════════════════════════════════════════════════════════════════
+   @forward makes another module's members available "through this
+   file" without using them itself. This way the main file writes a
+   single @use instead of several — a common pattern in real projects.
+   Note: !default variables can also be configured through this path
+   with `with`. @forward additionally supports `as prefix-*`, `show`
+   and `hide` to control exactly which members are re-exported.
+  ══════════════════════════════════════════════════════════════════*/
+
+@forward "variables"; // variables
+@forward "mixins"; // mixins
+@forward "functions"; // custom functions

@@ -1,0 +1,53 @@
+/*══════════════════════════════════════════════════════════════════
+   Mixins — @mixin and @include
+  ══════════════════════════════════════════════════════════════════
+   Mixins are reusable blocks of code; like a "function" that, instead
+   of returning a value, directly generates CSS. They are invoked with
+   @include.
+  ══════════════════════════════════════════════════════════════════*/
+
+// ─── 1) Simple mixin without arguments ───
+@mixin flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/*─── 2) Mixin with arguments and "default values" ───
+  If an argument is omitted at the call site, its default value is used.
+  "Named" call: @include bordered($color: red, $width: 2px) */
+@mixin bordered($color: #999999, $width: 1px, $style: solid) {
+    border: $width $style $color;
+}
+
+/*─── 3) Variable arguments with ... ───
+  Accepts any number of arguments and packs them into the $shadows list. */
+@mixin multi-shadow($shadows...) {
+    box-shadow: $shadows;
+}
+
+/*─── 4) Content block with @content ───
+  Any code written between { } at the call site lands exactly where
+  @content sits. Its most common use case is responsive media queries.
+  (Advanced: @content($args) plus `@include ... using ($args)` can pass values back out.) */
+@mixin breakpoint($width) {
+    @media (max-width: $width) {
+        @content;
+    }
+}
+
+// ─── 5) Interpolation #{} inside a "property name" (vendor prefixes) ───
+@mixin prefix($property, $value) {
+    -webkit-#{$property}: $value;
+    -moz-#{$property}: $value;
+    #{$property}: $value;
+}
+
+// ─── 6) A mixin can include another mixin ───
+@mixin round-badge($size: 48px) {
+    @include flex-center;
+    width: $size;
+    height: $size;
+    border-radius: 50%;
+    font-weight: 700;
+}
